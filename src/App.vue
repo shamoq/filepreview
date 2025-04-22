@@ -154,7 +154,6 @@ export default {
     },
   },
   created() {
-    debugger;
     window.showFiles = this.showFiles;
     window.addEventListener("keydown", this.handleKeydown);
     const search = new URL(location.href).search;
@@ -218,35 +217,40 @@ export default {
       }
     },
     showDemo() {
+
       const demoFiles = [
         // 图片 jpg,jpeg,bmp,gif,png,tif
-        { name: "花.jpg", url: "/public/files/花.jpg" },
-        { name: "小草.jpeg", url: "/public/files/小草.jpeg" },
-        { name: "风景.bmp", url: "/public/files/风景.bmp" },
-        { name: "小猫.gif", url: "/public/files/小猫.gif" },
-        { name: "server.png", url: "/public/files/server.png" },
-        { name: "特殊图片2.tif", url: "/public/files/特殊图片2.tif" },
+        { name: "花.jpg", url: "./public/files/花.jpg" },
+        { name: "小草.jpeg", url: "./public/files/小草.jpeg" },
+        { name: "风景.bmp", url: "./public/files/风景.bmp" },
+        { name: "小猫.gif", url: "./public/files/小猫.gif" },
+        { name: "server.png", url: "./public/files/server.png" },
+        { name: "特殊图片2.tif", url: "./public/files/特殊图片2.tif" },
         // Word文档 ( doc,docx )
-        { name: "租赁合同.docx", url: "/public/files/租赁合同.docx" },
+        { name: "租赁合同.docx", url: "./public/files/租赁合同.docx" },
         // Excel文档 ( xls,xlsx )
-        { name: "表格.xlsx", url: "/public/files/表格.xlsx" },
+        { name: "表格.xlsx", url: "./public/files/表格.xlsx" },
         // PowerPoint文档 ( ppt,pptx )
-        { name: "演示文稿.pptx", url: "/public/files/演示文稿.pptx" },
+        { name: "演示文稿.pptx", url: "./public/files/演示文稿.pptx" },
         // 文本文件
         {
           name: "子路、曾皙、冉有、公西华侍坐.txt",
-          url: "/public/files/子路、曾皙、冉有、公西华侍坐.txt",
+          url: "./public/files/子路、曾皙、冉有、公西华侍坐.txt",
         },
-        { name: "数据协议.xml", url: "/public/files/数据协议.xml" },
-        { name: "index.css", url: "/public/files/index.css" },
+        { name: "数据协议.xml", url: "./public/files/数据协议.xml" },
+        { name: "index.css", url: "./public/files/index.css" },
         // pdf文档
-        { name: "租赁文件.pdf", url: "/public/files/租赁文件.pdf" },
+        { name: "租赁文件.pdf", url: "./public/files/租赁文件.pdf" },
         // 发票
-        { name: "发票.ofd", url: "/public/files/发票.ofd" },
+        { name: "发票.ofd", url: "./public/files/发票.ofd" },
         // 不支持的文件格式
-        { name: "旧版表格.xls", url: "/public/files/旧版表格.xls" },
-        { name: "旧版文档.doc", url: "/public/files/旧版文档.doc" },
+        { name: "旧版表格.xls", url: "./public/files/旧版表格.xls" },
+        { name: "旧版文档.doc", url: "./public/files/旧版文档.doc" },
       ];
+      const isDevelopment = process.env.NODE_ENV === 'development';
+      if(!isDevelopment) {
+        demoFiles.map(t=>t.url = t.url.replace('/public', ''));
+      }
       this.showFiles(demoFiles, 0);
     },
     showFiles(files, index, nocache) {
