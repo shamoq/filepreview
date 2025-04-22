@@ -98,3 +98,7 @@ index: 当前文件的索引，默认0
 # 其他说明
 
 依赖的外部预览组件，仅当使用时才会加载。
+
+
+# 演示地址
+[https://shamoq.github.io/filepreview/](https://shamoq.github.io/filepreview/)
