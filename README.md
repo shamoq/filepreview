@@ -13,6 +13,7 @@
 | txt | ✅ | 纯文本预览  |  |   
 | css | ✅ | 纯文本预览  |  |                
 | 图片 | ✅ | viewerjs  | jpg,jpeg,bmp,gif,png,tif |    
+| ofd | ✅ | ofdviewer  |  |    
 
 # 安装
 ```bash

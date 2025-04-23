@@ -301,7 +301,8 @@ export default {
           const baseUrl = window.location.origin;
           const relativePath = this.normalizeRelativePath(url);
           const encodeUrl = encodeURIComponent(baseUrl + relativePath);
-          return '/ofdview/ofdview.html?file=' + encodeUrl;
+          const ofdFrame = this.normalizeRelativePath('ofdview/ofdview.html?file=');
+          return ofdFrame + encodeUrl;
         }
       }
       return url;
