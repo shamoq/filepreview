@@ -7,6 +7,7 @@ export default defineConfig({
   base: './',
   minify: true,
   plugins: [vue()],
+  publicDir: 'public',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src')

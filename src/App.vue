@@ -54,6 +54,7 @@
 <script>
 import { defineAsyncComponent } from "vue";
 import PreviewTxt from "./components/PreviewTxt.vue";
+import PreviewIframe from "./components/PreviewIframe.vue";
 import PreviewNotSupported from "./components/PreviewNotSupported.vue";
 import "@vue-office/excel/lib/index.css";
 import "viewerjs/dist/viewer.css";
@@ -102,12 +103,6 @@ const PreviewImage = defineAsyncComponent({
   loadingComponent: LoadingComponent,
 });
 
-// const PreviewOfd = defineAsyncComponent({
-//   loader: () => import('./components/PreviewOfd.vue').then(comp => comp.default || comp),
-//   errorComponent: ErrorComponent,
-//   loadingComponent: LoadingComponent
-// });
-
 export default {
   name: "App",
   components: {
@@ -117,8 +112,8 @@ export default {
     VueOfficePptx,
     PreviewTxt,
     PreviewImage,
-    // PreviewOfd,
     PreviewNotSupported,
+    PreviewIframe,
   },
   data() {
     return {
@@ -185,8 +180,8 @@ export default {
           return "VueOfficeExcel";
         case "pdf":
           return "VueOfficePdf";
-        // case 'ofd':
-        //   return 'PreviewOfd';
+        case 'ofd':
+          return 'PreviewIframe';
         case "pptx":
           // case 'ppt':
           return "VueOfficePptx";
@@ -220,37 +215,33 @@ export default {
 
       const demoFiles = [
         // 图片 jpg,jpeg,bmp,gif,png,tif
-        { name: "花.jpg", url: "./public/files/花.jpg" },
-        { name: "小草.jpeg", url: "./public/files/小草.jpeg" },
-        { name: "风景.bmp", url: "./public/files/风景.bmp" },
-        { name: "小猫.gif", url: "./public/files/小猫.gif" },
-        { name: "server.png", url: "./public/files/server.png" },
-        { name: "特殊图片2.tif", url: "./public/files/特殊图片2.tif" },
+        { name: "花.jpg", url: "./files/花.jpg" },
+        { name: "小草.jpeg", url: "./files/小草.jpeg" },
+        { name: "风景.bmp", url: "./files/风景.bmp" },
+        { name: "小猫.gif", url: "./files/小猫.gif" },
+        { name: "server.png", url: "./files/server.png" },
+        { name: "特殊图片2.tif", url: "./files/特殊图片2.tif" },
         // Word文档 ( doc,docx )
-        { name: "租赁合同.docx", url: "./public/files/租赁合同.docx" },
+        { name: "租赁合同.docx", url: "./files/租赁合同.docx" },
         // Excel文档 ( xls,xlsx )
-        { name: "表格.xlsx", url: "./public/files/表格.xlsx" },
+        { name: "表格.xlsx", url: "./files/表格.xlsx" },
         // PowerPoint文档 ( ppt,pptx )
-        { name: "演示文稿.pptx", url: "./public/files/演示文稿.pptx" },
+        { name: "演示文稿.pptx", url: "./files/演示文稿.pptx" },
         // 文本文件
         {
           name: "子路、曾皙、冉有、公西华侍坐.txt",
-          url: "./public/files/子路、曾皙、冉有、公西华侍坐.txt",
+          url: "./files/子路、曾皙、冉有、公西华侍坐.txt",
         },
-        { name: "数据协议.xml", url: "./public/files/数据协议.xml" },
-        { name: "index.css", url: "./public/files/index.css" },
+        { name: "数据协议.xml", url: "./files/数据协议.xml" },
+        { name: "index.css", url: "./files/index.css" },
         // pdf文档
-        { name: "租赁文件.pdf", url: "./public/files/租赁文件.pdf" },
+        { name: "租赁文件.pdf", url: "./files/租赁文件.pdf" },
         // 发票
-        { name: "发票.ofd", url: "./public/files/发票.ofd" },
+        { name: "发票.ofd", url: "./files/发票.ofd" },
         // 不支持的文件格式
-        { name: "旧版表格.xls", url: "./public/files/旧版表格.xls" },
-        { name: "旧版文档.doc", url: "./public/files/旧版文档.doc" },
+        { name: "旧版表格.xls", url: "./files/旧版表格.xls" },
+        { name: "旧版文档.doc", url: "./files/旧版文档.doc" },
       ];
-      const isDevelopment = process.env.NODE_ENV === 'development';
-      if(!isDevelopment) {
-        demoFiles.map(t=>t.url = t.url.replace('/public', ''));
-      }
       this.showFiles(demoFiles, 0);
     },
     showFiles(files, index, nocache) {
@@ -296,13 +287,55 @@ export default {
       this.currentFileIndex = index;
       const componentName = this.componentMap(file.type);
       if (componentName) {
-        this.currentFile = file.url;
+        this.currentFile = this.getPrefviewUrl(componentName, file.type, file.url);
         this.currentComponent = componentName;
         this.unsupportedFile = null;
         this.currentFileName = file.name;
       } else {
         this.unsupportedFile = file.name;
       }
+    },
+    getPrefviewUrl(componentName, type, url) {
+      if (componentName === "PreviewIframe" && type === 'ofd') {
+        if (this.isRelativePath(url)) {
+          const baseUrl = window.location.origin;
+          const relativePath = this.normalizeRelativePath(url);
+          const encodeUrl = encodeURIComponent(baseUrl + relativePath);
+          return '/ofdview/ofdview.html?file=' + encodeUrl;
+        }
+      }
+      return url;
+    },
+    isRelativePath(url) {
+      return !url.startsWith('http://') && !url.startsWith('https://');
+    },
+    normalizeRelativePath(url) {
+      const currentPath = window.location.pathname;
+      let basePath = currentPath.substring(0, currentPath.lastIndexOf('/'));
+      
+      // 处理以/开头的绝对路径
+      if (url.startsWith('/')) {
+        return url;
+      }
+      
+      // 移除开头的./
+      if (url.startsWith('./')) {
+        url = url.slice(2);
+      }
+      
+      // 处理../（上级目录）的情况
+      while (url.startsWith('../')) {
+        url = url.slice(3);
+        basePath = basePath.substring(0, basePath.lastIndexOf('/'));
+      }
+      
+      // 拼接并规范化路径
+      let absoluteUrl = basePath + '/' + url;
+      
+      // 规范化路径：移除多余的斜杠和点
+      absoluteUrl = absoluteUrl.replace(/\/+/g, '/').replace(/\.\/+/g, '/');
+      
+      return absoluteUrl;
     },
     renderedHandler() {
       this.isLoading = false;
